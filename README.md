@@ -1,0 +1,14 @@
+### Sample .env
+
+OPENAI_API_KEY=
+
+MONGODB_URI=
+
+JWT_SECRET=
+DB_NAME=caption-checker
+
+EMAIL_USER=
+EMAIL_PASS=
+EMAIL_FROM=
+
+NEXT_PUBLIC_BASE_URL=
