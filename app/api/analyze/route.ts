@@ -22,9 +22,9 @@ export async function POST(req: NextRequest) {
 
   const user = await User.findById(decoded.userId);
 
-  if (user.requests == 3) {
+  if (user.requests >= user.maxRequests) {
     return NextResponse.json(
-      { error: "Caption requests exceeded" },
+      { error: "Caption request limit reached, please upgrade your plan" },
       { status: 409 }
     );
   }

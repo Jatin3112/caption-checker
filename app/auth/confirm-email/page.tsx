@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 function EmailConfirmationContent() {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +21,15 @@ function EmailConfirmationContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
+
+  const updateSessionUserData = () => {
+    const userDataRaw = sessionStorage.getItem("userData");
+    if (userDataRaw) {
+      const userData = JSON.parse(userDataRaw);
+      userData.verified = true;
+      sessionStorage.setItem("userData", JSON.stringify(userData));
+    }
+  };
 
   useEffect(() => {
     // Confirm email on component mount
@@ -35,6 +45,7 @@ function EmailConfirmationContent() {
         const res = await axios.post("/api/confirm-email", { token });
         if (res.status === 200) {
           setIsConfirmed(true);
+          updateSessionUserData();
         } else {
           setError("This email confirmation link is invalid or has expired");
         }
@@ -43,7 +54,7 @@ function EmailConfirmationContent() {
       } finally {
         setIsLoading(false);
         setTimeout(() => {
-          router.push("/auth/login");
+          router.push("/checker");
         }, 2000);
       }
     };
@@ -64,18 +75,36 @@ function EmailConfirmationContent() {
   const handleResendEmail = async () => {
     setIsResending(true);
     setError("");
-
     try {
-      // Simulate API call to resend confirmation email
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const userId = sessionStorage.getItem("userId");
+      const res = await axios.post("/api/resend-confirm-email", {
+        userId,
+      });
 
-      // Mock successful resend
-      setResendCooldown(60); // 60 second cooldown
-    } catch (err) {
-      setError("Failed to resend confirmation email. Please try again.");
+      if (res.status === 200 && res.data.alreadyVerified) {
+        updateSessionUserData();
+        toast.success("User Already Verified");
+        setIsConfirmed(true);
+        return;
+      }
+
+      if (res.status === 200) {
+        setResendCooldown(60);
+      } else {
+        setError("Failed to resend email. Please try again.");
+      }
+    } catch (err: any) {
+      console.error("Resend error:", err);
+      setError(
+        err?.response?.data?.error ||
+          "Failed to resend email. Please try again."
+      );
     } finally {
       setIsResending(false);
       setIsLoading(false);
+      setTimeout(() => {
+        router.push("/checker");
+      }, 2000);
     }
   };
 
@@ -213,7 +242,7 @@ function EmailConfirmationContent() {
                 <Button
                   onClick={handleResendEmail}
                   disabled={isResending || resendCooldown > 0}
-                  className="w-full bg-indigo-500 hover:bg-indigo-600 dark:bg-violet-500 dark:hover:bg-violet-600 text-white"
+                  className="w-full mb-2 bg-indigo-500 hover:bg-indigo-600 dark:bg-violet-500 dark:hover:bg-violet-600 text-white"
                 >
                   {isResending ? (
                     <>
@@ -245,35 +274,12 @@ function EmailConfirmationContent() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Help Section */}
-        <div className="text-center space-y-2">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Still having trouble? Check your spam folder or contact support
-          </p>
-          <Button
-            variant="ghost"
-            className="text-xs text-indigo-500 dark:text-violet-500 hover:text-indigo-600 dark:hover:text-violet-600"
-          >
-            Contact Support →
-          </Button>
-        </div>
       </div>
     </div>
   );
 }
 
 export default function ConfirmEmailPage() {
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
       {/* Header */}
