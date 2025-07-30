@@ -60,7 +60,7 @@ export default function CheckerPage() {
       const currentUser = userRes.data.data;
       setUser(currentUser);
 
-      if (!currentUser?.verified) {
+      if (!currentUser?.verified && currentUser.requests >= 1) {
         toast.error("Please verify your email id first");
         return;
       }
