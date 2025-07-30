@@ -52,14 +52,12 @@ export default function LoginPage() {
         email: formData.email,
         password: formData.password,
       });
-
+      toast.success("Login Successfull");
       router.push("/checker");
     } catch (error) {
-      console.log(error);
-      alert("Login Failed");
+      toast.error("Something went wrong in login");
     } finally {
       setIsLoading(false);
-      toast.success("Login Successfull");
     }
   };
 

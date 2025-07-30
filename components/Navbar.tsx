@@ -1,13 +1,13 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
-  const [user, setUser] = useState<any>(null);
   const [isDark, setIsDark] = useState(true);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     if (isDark) {
@@ -17,40 +17,6 @@ const Navbar = () => {
     }
   }, [isDark]);
 
-  useEffect(() => {
-    const cachedUser = sessionStorage.getItem("userData");
-    if (cachedUser) {
-      setUser(JSON.parse(cachedUser));
-    }
-  }, []);
-
-  useEffect(() => {
-    const cachedUser = sessionStorage.getItem("userData");
-
-    if (cachedUser) {
-      setUser(JSON.parse(cachedUser));
-    } else {
-      const fetchUser = async () => {
-        try {
-          const res = await axios.get("/api/user");
-          const userData = res.data.data;
-          sessionStorage.setItem("userId", userData._id);
-          sessionStorage.setItem("userData", JSON.stringify(userData));
-          setUser(userData || null);
-        } catch (err) {
-          console.error("Failed to fetch user:", err);
-        }
-      };
-      fetchUser();
-    }
-  }, []);
-
-  const handleLogout = async () => {
-    await axios.get("/api/logout");
-    sessionStorage.removeItem("userId");
-    sessionStorage.removeItem("userData");
-    window.location.reload();
-  };
   return (
     <header className="border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -134,7 +100,7 @@ const Navbar = () => {
                     <Button
                       variant="link"
                       className="text-slate-900 dark:text-gray-100"
-                      onClick={handleLogout}
+                      onClick={logout}
                     >
                       Logout
                     </Button>
