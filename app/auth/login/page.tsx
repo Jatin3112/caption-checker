@@ -59,7 +59,8 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("Login failed");
 
       await new Promise((res) => setTimeout(res, 300));
-      router.push("/checker?login=true");
+      // router.push("/checker?login=true");
+      window.location.href = "/checker";
       toast.success("Login Successful");
     } catch (error) {
       toast.error("Something went wrong during login");
