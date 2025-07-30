@@ -5,7 +5,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Secret key 
+// Secret key
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export async function POST(req: Request) {
@@ -13,7 +13,10 @@ export async function POST(req: Request) {
   const { email, password } = await req.json();
 
   if (!email || !password) {
-    return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Email and password are required" },
+      { status: 400 }
+    );
   }
 
   const user = await User.findOne({ email });
@@ -25,9 +28,6 @@ export async function POST(req: Request) {
   if (!isMatch) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
-
-  // Optionally create a JWT here and return it
-  // return NextResponse.json({ message: "Login successful", userId: user._id });
 
   // Create JWT payload
   const payload = {
@@ -41,20 +41,26 @@ export async function POST(req: Request) {
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 
   // Create response with cookie
-  const response = NextResponse.json({
-    message: "User created successfully",
-    accessToken : token,
-    data:payload
-  });
+  const response = new NextResponse(
+    JSON.stringify({
+      message: "User created successfully",
+      accessToken: token,
+      data: payload,
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-  response.cookies.set({
-    name: "accessToken",
-    value: token,
+  response.cookies.set("accessToken", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 7 * 24 * 60 * 60, // 7 days
+    maxAge: 7 * 24 * 60 * 60,
   });
 
   return response;
