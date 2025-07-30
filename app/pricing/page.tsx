@@ -106,7 +106,7 @@ export default function PricingPage() {
       return;
     }
 
-    if (!user._id) {
+    if (!user) {
       router.push("/auth/login");
       return;
     }
