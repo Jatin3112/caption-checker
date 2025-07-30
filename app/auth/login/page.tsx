@@ -43,19 +43,25 @@ export default function LoginPage() {
   }, [isDark]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    try {
-      e.preventDefault();
-      setIsLoading(true);
+    e.preventDefault();
+    setIsLoading(true);
 
-      // Simulate API call
-      await axios.post("/api/login", {
-        email: formData.email,
-        password: formData.password,
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-      toast.success("Login Successfull");
+
+      if (!res.ok) throw new Error("Login failed");
+
+      toast.success("Login Successful");
       router.push("/checker");
     } catch (error) {
-      toast.error("Something went wrong in login");
+      toast.error("Something went wrong during login");
     } finally {
       setIsLoading(false);
     }
