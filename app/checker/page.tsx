@@ -61,7 +61,7 @@ export default function CheckerPage() {
       setUser(currentUser);
 
       if (!currentUser?.verified && currentUser.requests >= 1) {
-        toast.error("Please verify your email id first");
+        toast.error("Please verify your email id for further caption requests");
         return;
       }
       const response = await axios.post(

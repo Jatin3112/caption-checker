@@ -34,7 +34,10 @@ export async function POST(req: NextRequest) {
 
   if (user.requests >= user.maxRequests) {
     return NextResponse.json(
-      { error: "Caption request limit reached, please upgrade your plan" },
+      {
+        error:
+          "Caption request limit reached, please upgrade your plan from the pricing tab in Navbar",
+      },
       { status: 409 }
     );
   }
