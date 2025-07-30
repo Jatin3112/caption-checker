@@ -9,9 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import {
-  Moon,
-  Sun,
-  ArrowLeft,
   CreditCard,
   Lock,
   Shield,
@@ -20,12 +17,10 @@ import {
   User,
   Mail,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 
 function PaymentContent() {
-  const [isDark, setIsDark] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentData, setPaymentData] = useState({
     cardNumber: "",
@@ -80,14 +75,6 @@ function PaymentContent() {
     billing === "yearly"
       ? currentPlan.monthlyPrice * 12 - currentPlan.yearlyPrice
       : 0;
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

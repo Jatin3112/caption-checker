@@ -15,7 +15,10 @@ export async function GET(req: NextRequest) {
   if (!decoded) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
-  const user = await User.findById(decoded.userId);
+  const user = await User.findById(decoded.userId).select(
+    "-password -resetToken -verifyEmailToken"
+  );
+
   return NextResponse.json({
     data: user,
     message: "User fetched Successfully",

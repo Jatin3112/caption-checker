@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Moon,
-  Sun,
-  ArrowLeft,
   Check,
   Star,
   Zap,
@@ -21,13 +18,14 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import axios from "axios";
+import { loadRazorpayScript } from "@/lib/razorpay";
 
 interface PricingPlan {
   id: string;
   name: string;
   description: string;
   monthlyPrice: number;
-  yearlyPrice: number;
   icon: React.ReactNode;
   badge?: string;
   badgeColor?: string;
@@ -42,7 +40,6 @@ const plans: PricingPlan[] = [
     name: "Starter",
     description: "Perfect for trying out CaptionChecker",
     monthlyPrice: 100,
-    yearlyPrice: 100, // Only monthly for now
     icon: <Sparkles className="h-6 w-6" />,
     features: [
       "10 caption analyses per month",
@@ -58,7 +55,6 @@ const plans: PricingPlan[] = [
     name: "Popular",
     description: "Most chosen by content creators",
     monthlyPrice: 500,
-    yearlyPrice: 500, // Only monthly for now
     icon: <Zap className="h-6 w-6" />,
     badge: "Most Popular",
     badgeColor: "bg-pink-500 dark:bg-pink-400",
@@ -77,7 +73,6 @@ const plans: PricingPlan[] = [
     name: "Pro",
     description: "For serious content creators",
     monthlyPrice: 1000,
-    yearlyPrice: 1000, // Only monthly for now
     icon: <Crown className="h-6 w-6" />,
     badge: "Best Value",
     badgeColor: "bg-amber-500 dark:bg-amber-400",
@@ -92,8 +87,13 @@ const plans: PricingPlan[] = [
   },
 ];
 
+const planPrices: Record<string, number> = {
+  starter: 100,
+  popular: 500,
+  pro: 1000,
+};
+
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
@@ -104,36 +104,68 @@ export default function PricingPage() {
       return;
     }
 
-    if (planId === "enterprise") {
-      // Redirect to contact form or calendar booking
-      window.open(
-        "mailto:sales@captionchecker.com?subject=Enterprise Plan Inquiry",
-        "_blank"
-      );
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) {
+      router.push("/auth/login");
       return;
     }
+    const amount = planPrices[planId];
+    if (!amount) return alert("Invalid plan selected");
 
     setSelectedPlan(planId);
     setIsProcessing(true);
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const razorpayLoaded = await loadRazorpayScript();
+    if (!razorpayLoaded) {
+      alert("Razorpay SDK failed to load.");
+      setIsProcessing(false);
+      return;
+    }
 
-    // Redirect to payment gateway (Stripe, etc.)
-    router.push(
-      `/payment?plan=${planId}&billing=${isYearly ? "yearly" : "monthly"}`
-    );
+    try {
+      // Create order using Axios
+      const orderResponse = await axios.post("/api/purchase-plan", { amount });
+      const order = orderResponse.data;
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+        amount: order.amount,
+        currency: "INR",
+        name: "Caption Checker",
+        description: `Purchase ${planId} Plan`,
+        order_id: order.id,
+        handler: async function (response: any) {
+          // Update plan using Axios
+          await axios.post("/api/update-plan", {
+            userId,
+            planId,
+            paymentId: response.razorpay_payment_id,
+          });
+
+          router.push("/payment/success");
+        },
+        prefill: {
+          name: "Test User",
+          email: "test@example.com",
+          contact: "9999999999",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.open();
+    } catch (error: any) {
+      console.error("Payment failed:", error?.response?.data || error.message);
+      alert("Payment failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const getPrice = (plan: PricingPlan) => {
-    return isYearly ? plan.yearlyPrice : plan.monthlyPrice;
-  };
-
-  const getSavings = (plan: PricingPlan) => {
-    if (plan.monthlyPrice === 0) return 0;
-    const monthlyTotal = plan.monthlyPrice * 12;
-    const yearlySavings = monthlyTotal - plan.yearlyPrice;
-    return Math.round((yearlySavings / monthlyTotal) * 100);
+    return plan.monthlyPrice;
   };
 
   return (
@@ -206,13 +238,6 @@ export default function PricingPage() {
                       /month
                     </span>
                   </div>
-                  {isYearly &&
-                    plan.monthlyPrice > 0 &&
-                    getSavings(plan) > 0 && (
-                      <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                        Save {getSavings(plan)}% annually
-                      </p>
-                    )}
                 </div>
 
                 {/* Features */}

@@ -18,18 +18,37 @@ const Navbar = () => {
   }, [isDark]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const res = await axios.get("/api/user");
+    const cachedUser = sessionStorage.getItem("userData");
+    if (cachedUser) {
+      setUser(JSON.parse(cachedUser));
+    }
+  }, []);
 
-      console.log("RES", res);
+  useEffect(() => {
+    const cachedUser = sessionStorage.getItem("userData");
 
-      setUser(res.data.data || null);
-    };
-    fetchUser();
+    if (cachedUser) {
+      setUser(JSON.parse(cachedUser));
+    } else {
+      const fetchUser = async () => {
+        try {
+          const res = await axios.get("/api/user");
+          const userData = res.data.data;
+          sessionStorage.setItem("userId", userData._id);
+          sessionStorage.setItem("userData", JSON.stringify(userData));
+          setUser(userData || null);
+        } catch (err) {
+          console.error("Failed to fetch user:", err);
+        }
+      };
+      fetchUser();
+    }
   }, []);
 
   const handleLogout = async () => {
     await axios.get("/api/logout");
+    sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("userData");
     window.location.reload();
   };
   return (

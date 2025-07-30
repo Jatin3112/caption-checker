@@ -41,9 +41,19 @@ export default function CheckerPage() {
   const [analysis, setAnalysis] = useState<CaptionAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   const analyzeCaption = async (caption: string) => {
     try {
+      const userData = sessionStorage.getItem("userData");
+      if (userData) {
+        setUser(JSON.parse(userData));
+      }
+
+      if (!user?.verified) {
+        toast.error("Please verify your email id first");
+        return;
+      }
       const response = await axios.post(
         "/api/analyze",
         { caption },
@@ -58,8 +68,10 @@ export default function CheckerPage() {
       toast.success("Captions generated successfully");
       return data;
     } catch (error: any) {
+      console.log("Error", error);
       toast.error(
-        "Something went wrong in generating captions" || error.message
+        error.response.data.error ||
+          "Something went wrong in generating captions"
       );
       throw error;
     }
