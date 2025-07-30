@@ -120,9 +120,9 @@ const Navbar = () => {
                     <div>
                       <strong>Email:</strong> {user.email}
                     </div>
-                    <div>
+                    {/* <div>
                       <strong>Plan:</strong> {user.plan || "Free"}
-                    </div>
+                    </div> */}
                     <div>
                       <strong>User Verified:</strong>{" "}
                       {user.verified ? "Verified" : "Not Verified"}
