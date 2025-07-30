@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 import { loadRazorpayScript } from "@/lib/razorpay";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PricingPlan {
   id: string;
@@ -96,6 +97,7 @@ const planPrices: Record<string, number> = {
 export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { user } = useAuth();
   const router = useRouter();
 
   const handlePlanSelect = async (planId: string) => {
@@ -104,8 +106,7 @@ export default function PricingPage() {
       return;
     }
 
-    const userId = sessionStorage.getItem("userId");
-    if (!userId) {
+    if (!user._id) {
       router.push("/auth/login");
       return;
     }
@@ -137,7 +138,7 @@ export default function PricingPage() {
         handler: async function (response: any) {
           // Update plan using Axios
           await axios.post("/api/update-plan", {
-            userId,
+            userId: user._id,
             planId,
             paymentId: response.razorpay_payment_id,
           });

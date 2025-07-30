@@ -45,12 +45,11 @@ export default function CheckerPage() {
 
   const analyzeCaption = async (caption: string) => {
     try {
-      const userData = sessionStorage.getItem("userData");
-      if (userData) {
-        setUser(JSON.parse(userData));
-      }
+      const userRes = await axios.get("/api/user");
+      const currentUser = userRes.data.data;
+      setUser(currentUser);
 
-      if (!user?.verified) {
+      if (!currentUser?.verified) {
         toast.error("Please verify your email id first");
         return;
       }
@@ -83,8 +82,6 @@ export default function CheckerPage() {
     setIsAnalyzing(true);
     try {
       const result = await analyzeCaption(caption);
-
-      console.log("RESULt FROM AI", result);
       setAnalysis(result);
     } catch (error) {
       console.error("Analysis failed:", error);

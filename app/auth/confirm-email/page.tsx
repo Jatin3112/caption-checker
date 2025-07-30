@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 function EmailConfirmationContent() {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,15 +22,7 @@ function EmailConfirmationContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-
-  const updateSessionUserData = () => {
-    const userDataRaw = sessionStorage.getItem("userData");
-    if (userDataRaw) {
-      const userData = JSON.parse(userDataRaw);
-      userData.verified = true;
-      sessionStorage.setItem("userData", JSON.stringify(userData));
-    }
-  };
+  const { user, fetchUser } = useAuth();
 
   useEffect(() => {
     // Confirm email on component mount
@@ -45,7 +38,7 @@ function EmailConfirmationContent() {
         const res = await axios.post("/api/confirm-email", { token });
         if (res.status === 200) {
           setIsConfirmed(true);
-          updateSessionUserData();
+          fetchUser();
         } else {
           setError("This email confirmation link is invalid or has expired");
         }
@@ -76,13 +69,12 @@ function EmailConfirmationContent() {
     setIsResending(true);
     setError("");
     try {
-      const userId = sessionStorage.getItem("userId");
       const res = await axios.post("/api/resend-confirm-email", {
-        userId,
+        userId: user._id,
       });
 
       if (res.status === 200 && res.data.alreadyVerified) {
-        updateSessionUserData();
+        fetchUser();
         toast.success("User Already Verified");
         setIsConfirmed(true);
         return;
