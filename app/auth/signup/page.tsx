@@ -69,8 +69,11 @@ export default function SignupPage() {
       toast.success("User created successfully.");
       toast.success("Please verify your email");
       router.push("/auth/login");
-    } catch (error) {
-      alert("Error creating a user");
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.error ||
+          "Something went wrong in creating a user"
+      );
     } finally {
       setIsLoading(false);
     }
