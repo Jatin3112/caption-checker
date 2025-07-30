@@ -22,6 +22,16 @@ export async function POST(req: NextRequest) {
 
   const user = await User.findById(decoded.userId);
 
+  const planLimits: Record<string, number> = {
+    free: 2,
+    starter: 2,
+    popular: 3,
+    pro: 4,
+  };
+
+  const plan = user.plan || "free";
+  const limit = planLimits[plan] || 2;
+
   if (user.requests >= user.maxRequests) {
     return NextResponse.json(
       { error: "Caption request limit reached, please upgrade your plan" },
@@ -32,71 +42,80 @@ export async function POST(req: NextRequest) {
   if (!caption) {
     return NextResponse.json({ error: "Caption is required" }, { status: 400 });
   }
-  const prompt = `You are a viral content expert helping short-form creators (YouTube Shorts, Instagram Reels, TikTok) write better captions.
+  const prompt = `You are a top-tier viral content strategist for short-form platforms like YouTube Shorts, Instagram Reels, and TikTok.
 
-Analyze the following caption:
+Your job is to analyze and improve the following caption to make it more viral, engaging, and platform-optimized:
 
 "${caption}"
 
-Evaluate it on these 7 factors. Give scores out of 10 (or Yes/No for CTA), and provide improvement suggestions.
+---
+
+### Analyze this caption on 7 key performance factors:
+
+Give scores from **1 to 10**, or **Yes/No** for CTA. Keep each score **strict and realistic**, as if evaluating for a viral creator campaign.
 
 **Scoring Criteria:**
-1. **Catchiness** – How attention-grabbing is the caption overall?
-2. **Grammar Check** – Are there any spelling, punctuation, or grammar issues?
-3. **Caption Clarification** – Is the message clear and easy to understand?
-4. **Hashtag Usage** – Are hashtags relevant, niche-specific, and discovery-optimized?
-5. **Hook Strength** – Are the first 5–10 words compelling and scroll-stopping?
-6. **Call-to-Action (CTA) Presence** – Does it include CTAs like “Save this”, “Watch till end”, etc.?
-7. **Tone Detection** – What is the overall tone? (funny, emotional, educational, sarcastic, etc.)
+1. **Catchiness** – Does it immediately grab attention or create curiosity?
+2. **Grammar Check** – Are there any spelling, grammar, or punctuation issues?
+3. **Caption Clarity** – Is the message easy to understand on a first read?
+4. **Hashtag Strategy** – Are the hashtags relevant, niche-targeted, and optimized for discovery?
+5. **Hook Strength** – Are the first 5–10 words scroll-stopping or pattern-breaking?
+6. **Call-to-Action (CTA)** – Is there an effective CTA like “Save this”, “Watch till the end”, “Comment below”, etc.?
+7. **Tone** – Identify the tone: e.g. Informative, Entertaining, Emotional, Sarcastic, Motivational, Dramatic, Urgent, etc.
 
-Then provide:
+---
 
-- Brief suggestions to improve the original caption
-- **3 improved versions** of the caption that:
-  - Are more trendy and viral
-  - Include **more relevant emojis at least four of them** naturally placed
-  - Use strong hooks
-  - Include a CTA (if it makes sense)
-  - Use better or additional hashtags minimum four of them
+### Then do the following:
 
-For each improved caption, provide:
-- The full caption text
-- The same 7-point score breakdown
+**1. Suggest ways to improve the original caption**, including:
+- Hook changes
+- Emoji placement
+- CTA ideas
+- Hashtag improvements
 
-**Output JSON structure:**
+**2. Generate ${limit} highly improved, viral-style caption alternatives** that:
+- Use **strong hooks** in the first 5–10 words
+- Include **at least 4 relevant emojis** (naturally placed, not forced)
+- Have a clear **CTA** (if it fits context)
+- Use **at least 4 niche-specific and viral hashtags**
+- Are trend-aware, emotionally punchy, and easy to scan in 1–2 seconds
+
+---
+
+### Output your answer in this **JSON format**:
 
 {
   "original_analysis": {
-    "catchiness": 6,
-    "grammar": 9,
-    "clarification": 8,
-    "hashtag_usage": 5,
-    "hook_strength": 6,
-    "cta_present": "No",
-    "tone": "Informative",
+    "catchiness": <score>,
+    "grammar": <score>,
+    "clarity": <score>,
+    "hashtag_usage": <score>,
+    "hook_strength": <score>,
+    "cta_present": "Yes" or "No",
+    "tone": "<detected tone>",
     "suggestions": [
-      "Use a more engaging hook.",
-      "Add 2–3 emojis for emotional punch.",
-      "Include a clear call-to-action.",
-      "Use niche-specific hashtags."
+      "<suggestion 1>",
+      "<suggestion 2>",
+      ...
     ]
   },
   "improved_captions": [
     {
-      "text": "Nobody talks about these 5 insane weight loss hacks 😱🔥 #FitnessTips #LoseWeightFast",
+      "text": "<improved caption>",
       "scores": {
-        "catchiness": 9,
-        "grammar": 10,
-        "clarification": 9,
-        "hashtag_usage": 8,
-        "hook_strength": 9,
-        "cta_present": "Yes",
-        "tone": "Excited"
+        "catchiness": <score>,
+        "grammar": <score>,
+        "clarity": <score>,
+        "hashtag_usage": <score>,
+        "hook_strength": <score>,
+        "cta_present": "Yes" or "No",
+        "tone": "<new tone>"
       }
     },
     ...
   ]
-}`;
+}
+`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
