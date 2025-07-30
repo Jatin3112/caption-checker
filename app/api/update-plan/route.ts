@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    user.requests = 0;
     user.plan = planId;
     user.paymentId = paymentId;
     user.maxRequests = planLimits[planId] || 3;

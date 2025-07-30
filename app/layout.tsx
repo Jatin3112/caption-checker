@@ -8,6 +8,9 @@ import { AuthProvider } from "@/contexts/AuthContext"; // ✅ Add this
 export const metadata: Metadata = {
   title: "Caption Checker",
   description: "Created by Jatin",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

@@ -8,7 +8,7 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: NextRequest) {
-  const { caption } = await req.json();
+  const { caption, captionVibe } = await req.json();
   const token = req.cookies.get("accessToken")?.value;
 
   if (!token) {
@@ -45,6 +45,15 @@ export async function POST(req: NextRequest) {
   const prompt = `You are a top-tier viral content strategist for short-form platforms like YouTube Shorts, Instagram Reels, and TikTok.
 
 Your job is to analyze and improve the following caption to make it more viral, engaging, and platform-optimized:
+
+---
+
+### 📌 User-defined Vibe:
+"${captionVibe}"
+
+**Try to align the tone and improvements with this vibe where possible.**
+
+---
 
 "${caption}"
 

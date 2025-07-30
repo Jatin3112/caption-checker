@@ -123,7 +123,7 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <div className="md:hidden mt-2 space-y-2">
             <div className="flex items-center flex-col space-x-2">
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsDark(!isDark)}
@@ -134,7 +134,7 @@ const Navbar = () => {
                 ) : (
                   <Moon className="h-5 w-5" />
                 )}
-              </Button>
+              </Button> */}
               <Link href="/pricing">
                 <Button
                   variant="ghost"
@@ -163,17 +163,13 @@ const Navbar = () => {
               </>
             ) : (
               <div className="space-y-1">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                   <div className="w-8 h-8 rounded-full bg-indigo-500 dark:bg-violet-500 flex items-center justify-center text-white font-semibold text-sm">
                     {(user.fullName || user.email)[0]?.toUpperCase()}
                   </div>
                   <span className="text-slate-900 dark:text-gray-100 font-medium">
                     {user.fullName || user.email}
                   </span>
-                </div>
-                <div className="text-sm text-slate-600 dark:text-gray-300">
-                  <strong>User Verified:</strong>{" "}
-                  {user.verified ? "Verified" : "Not Verified"}
                 </div>
                 <Button
                   variant="ghost"

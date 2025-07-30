@@ -40,7 +40,7 @@ const plans: PricingPlan[] = [
     id: "starter",
     name: "Starter",
     description: "Perfect for trying out CaptionChecker",
-    monthlyPrice: 100,
+    monthlyPrice: 99,
     icon: <Sparkles className="h-6 w-6" />,
     features: [
       "10 caption analyses per month",
@@ -49,13 +49,13 @@ const plans: PricingPlan[] = [
       "Basic hashtag suggestions",
       // "Caption history (30 days)",
     ],
-    cta: "Get Started - ₹100",
+    cta: "Get Started - ₹99",
   },
   {
     id: "popular",
     name: "Popular",
     description: "Most chosen by content creators",
-    monthlyPrice: 500,
+    monthlyPrice: 499,
     icon: <Zap className="h-6 w-6" />,
     badge: "Most Popular",
     badgeColor: "bg-pink-500 dark:bg-pink-400",
@@ -67,13 +67,13 @@ const plans: PricingPlan[] = [
       "Trending hashtag database",
       // "Caption history (60 days)",
     ],
-    cta: "Choose Popular - ₹500",
+    cta: "Choose Popular - ₹499",
   },
   {
     id: "pro",
     name: "Pro",
     description: "For serious content creators",
-    monthlyPrice: 1000,
+    monthlyPrice: 999,
     icon: <Crown className="h-6 w-6" />,
     badge: "Best Value",
     badgeColor: "bg-amber-500 dark:bg-amber-400",
@@ -84,14 +84,14 @@ const plans: PricingPlan[] = [
       "Trending hashtag database",
       // "Caption history (90 days)",
     ],
-    cta: "Go Pro - ₹1000",
+    cta: "Go Pro - ₹999",
   },
 ];
 
 const planPrices: Record<string, number> = {
-  starter: 100,
-  popular: 500,
-  pro: 1000,
+  starter: 99,
+  popular: 499,
+  pro: 999,
 };
 
 export default function PricingPage() {

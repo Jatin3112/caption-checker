@@ -15,7 +15,7 @@ interface CaptionAnalysis {
   original_analysis: {
     catchiness: number;
     grammar: number;
-    clarification: number;
+    clarity: number;
     hashtag_usage: number;
     hook_strength: number;
     cta_present: string;
@@ -27,7 +27,7 @@ interface CaptionAnalysis {
     scores: {
       catchiness: number;
       grammar: number;
-      clarification: number;
+      clarity: number;
       hashtag_usage: number;
       hook_strength: number;
       cta_present: string;
@@ -38,10 +38,21 @@ interface CaptionAnalysis {
 
 export default function CheckerPage() {
   const [caption, setCaption] = useState("");
+  const [captionVibe, setCaptionVibe] = useState("");
   const [analysis, setAnalysis] = useState<CaptionAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
+
+  const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    if (value.length <= 300) {
+      setCaption(value);
+    } else {
+      toast.error("Caption maximum length reached");
+    }
+  };
 
   const analyzeCaption = async (caption: string) => {
     try {
@@ -55,7 +66,7 @@ export default function CheckerPage() {
       }
       const response = await axios.post(
         "/api/analyze",
-        { caption },
+        { caption, captionVibe },
         {
           headers: {
             "Content-Type": "application/json",
@@ -82,6 +93,8 @@ export default function CheckerPage() {
     setIsAnalyzing(true);
     try {
       const result = await analyzeCaption(caption);
+
+      console.log("RESUOLT FROM AI", result);
       setAnalysis(result);
     } catch (error) {
       console.error("Analysis failed:", error);
@@ -132,16 +145,33 @@ export default function CheckerPage() {
                 <Textarea
                   placeholder="Paste your caption here... Include hashtags, emojis, and any CTAs you want analyzed!"
                   value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
+                  maxLength={301}
+                  onChange={handleCaptionChange}
                   className="min-h-[200px] bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-slate-900 dark:text-gray-100"
                 />
+
+                {/* ✨ Add Caption Vibe Selector Here */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-slate-700 dark:text-gray-300">
+                    Describe the vibe for the caption
+                  </label>
+                  <input
+                    type="text"
+                    value={captionVibe}
+                    onChange={(e) => setCaptionVibe(e.target.value)}
+                    placeholder="e.g. playful, sarcastic, educational..."
+                    className="w-full rounded-md border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white px-3 py-2 text-sm"
+                  />
+                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     {caption.length} characters
                   </span>
                   <Button
                     onClick={handleAnalyze}
-                    disabled={!caption.trim() || isAnalyzing}
+                    disabled={
+                      !caption.trim() || !captionVibe.trim() || isAnalyzing
+                    }
                     className="bg-indigo-500 hover:bg-indigo-600 dark:bg-violet-500 dark:hover:bg-violet-600 text-white"
                   >
                     {isAnalyzing ? "Analyzing..." : "Analyze Caption"}
@@ -203,14 +233,14 @@ export default function CheckerPage() {
                         </span>
                         <span
                           className={`font-bold ${getScoreColor(
-                            analysis.original_analysis.clarification
+                            analysis.original_analysis.clarity
                           )}`}
                         >
-                          {analysis.original_analysis.clarification}/10
+                          {analysis.original_analysis.clarity}/10
                         </span>
                       </div>
                       <Progress
-                        value={analysis.original_analysis.clarification * 10}
+                        value={analysis.original_analysis.clarity * 10}
                         className="h-2"
                       />
                     </div>
@@ -279,18 +309,30 @@ export default function CheckerPage() {
                       Suggestions for Improvement
                     </h4>
                     <ul className="space-y-1">
-                      {analysis.original_analysis.suggestions.map(
-                        (suggestion, index) => (
-                          <li
-                            key={index}
-                            className="text-sm text-gray-500 dark:text-gray-400 flex items-start"
-                          >
-                            <span className="text-indigo-500 dark:text-violet-500 mr-2">
-                              •
-                            </span>
-                            {suggestion}
-                          </li>
-                        )
+                      {(showAllSuggestions
+                        ? analysis.original_analysis.suggestions
+                        : analysis.original_analysis.suggestions.slice(0, 2)
+                      ).map((suggestion, index) => (
+                        <li
+                          key={index}
+                          className="text-sm text-gray-500 dark:text-gray-400 flex items-start"
+                        >
+                          <span className="text-indigo-500 dark:text-violet-500 mr-2">
+                            •
+                          </span>
+                          {suggestion}
+                        </li>
+                      ))}
+
+                      {analysis.original_analysis.suggestions.length > 2 && (
+                        <button
+                          className="text-xs text-indigo-600 dark:text-violet-400 hover:underline mt-1"
+                          onClick={() =>
+                            setShowAllSuggestions(!showAllSuggestions)
+                          }
+                        >
+                          {showAllSuggestions ? "Show Less" : "Show More"}
+                        </button>
                       )}
                     </ul>
                   </div>
@@ -359,7 +401,19 @@ export default function CheckerPage() {
                             {improved.scores.hook_strength}/10
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">
-                            Hook
+                            Hook Strength
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div
+                            className={`text-xl font-bold ${getScoreColor(
+                              improved.scores.clarity
+                            )}`}
+                          >
+                            {improved.scores.clarity}/10
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Clarity
                           </div>
                         </div>
                         <div className="text-center">
@@ -374,17 +428,6 @@ export default function CheckerPage() {
                             Hashtags
                           </div>
                         </div>
-                        <div className="text-center">
-                          <Badge
-                            variant={
-                              improved.scores.cta_present === "Yes"
-                                ? "default"
-                                : "secondary"
-                            }
-                          >
-                            CTA: {improved.scores.cta_present}
-                          </Badge>
-                        </div>
                       </div>
 
                       <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-slate-700">
@@ -397,6 +440,17 @@ export default function CheckerPage() {
                         <span className="text-sm text-gray-500 dark:text-gray-400">
                           Grammar: {improved.scores.grammar}/10
                         </span>
+                        <div className="text-center">
+                          <Badge
+                            variant={
+                              improved.scores.cta_present === "Yes"
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            CTA: {improved.scores.cta_present}
+                          </Badge>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

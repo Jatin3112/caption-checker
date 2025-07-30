@@ -3,17 +3,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Moon,
-  Sun,
-  ArrowRight,
-  Play,
-  Star,
-  Users,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight, Play, Star, Users, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import axios from "axios";
 import Navbar from "@/components/Navbar";
 
 const heroOptions = [
@@ -155,7 +146,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-gray-500 dark:text-gray-400 mb-8">
-              ✅ Trusted by creators across Instagram, YouTube, TikTok
+              ✅ Trusted by creators across Instagram, YouTube Shorts
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex items-center justify-center space-x-3">
