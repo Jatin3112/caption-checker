@@ -16,7 +16,7 @@ export async function sendResetEmail(to: string, resetLink: string) {
     html: `
       <p>Hi there,</p>
       <p>You requested to reset your password.</p>
-      <p><a href="${resetLink}" target="_blank">Click here to reset your password</a></p>
+      <p><a href="${resetLink}" target="_blank">${resetLink}</a></p>
       <p>This link will expire in 15 minutes.</p>
     `,
   });
@@ -32,7 +32,7 @@ export async function sendUserVerificationEmail(
     html: `
     <h2>Email Verification</h2>
     <p>Click the link below to verify your email:</p>
-    <a href="${verifyLink}">Confirm Your Email</a>
+    <a href="${verifyLink}">${verifyLink}</a>
      `,
   });
 }

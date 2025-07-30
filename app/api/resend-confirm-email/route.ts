@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const verifyLink = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/confirm-email?token=${token}`;
+    const verifyLink = `https://caption-checker.vercel.app/auth/confirm-email?token=${token}`;
 
     await sendUserVerificationEmail(user.email, verifyLink);
 
