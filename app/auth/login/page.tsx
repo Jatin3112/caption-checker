@@ -60,7 +60,7 @@ export default function LoginPage() {
 
       await new Promise((res) => setTimeout(res, 300));
       toast.success("Login Successful");
-      router.push("/checker");
+      router.push("/checker?login=true");
     } catch (error) {
       toast.error("Something went wrong during login");
     } finally {
