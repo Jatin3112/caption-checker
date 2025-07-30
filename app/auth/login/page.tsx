@@ -53,7 +53,6 @@ export default function LoginPage() {
         password: formData.password,
       });
 
-      // Mock successful login
       router.push("/checker");
     } catch (error) {
       console.log(error);
