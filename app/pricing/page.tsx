@@ -146,9 +146,8 @@ export default function PricingPage() {
           router.push("/payment/success");
         },
         prefill: {
-          name: "Test User",
-          email: "test@example.com",
-          contact: "9999999999",
+          name: user.fullName,
+          email: user.email,
         },
         theme: {
           color: "#3399cc",
