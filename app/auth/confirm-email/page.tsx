@@ -95,7 +95,7 @@ function EmailConfirmationContent() {
       setIsResending(false);
       setIsLoading(false);
       setTimeout(() => {
-        router.push("/checker");
+        router.push("/auth/login");
       }, 2000);
     }
   };

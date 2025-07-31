@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   user.verifyEmailToken = token;
   await user.save();
 
-  const verifyLink = `https://caption-checker.vercel.app/auth/confirm-email?token=${token}`;
+  const verifyLink = `https://caption-checker.in/auth/confirm-email?token=${token}`;
 
   await sendUserVerificationEmail(email, verifyLink);
 

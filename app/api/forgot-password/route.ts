@@ -31,7 +31,7 @@ export async function POST(req: Request) {
   user.resetTokenExp = resetTokenExp;
   await user.save();
 
-  const resetLink = `https://caption-checker.vercel.app/auth/reset-password?token=${resetToken}`;
+  const resetLink = `https://caption-checker.in/auth/reset-password?token=${resetToken}`;
   await sendResetEmail(email, resetLink);
 
   return NextResponse.json({ message: "Reset link sent to your email." });
