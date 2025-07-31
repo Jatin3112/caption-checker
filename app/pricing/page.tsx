@@ -181,7 +181,7 @@ export default function PricingPage() {
             Choose Your Plan 💎
           </h1>
           <p className="text-xl text-gray-500 dark:text-gray-400 max-w-3xl mx-auto mb-8">
-            Affordable pricing for Indian creators. Start with just ₹100 and
+            Affordable pricing for Indian creators. Start with just ₹99 and
             scale as you grow. All plans include our core AI-powered caption
             analysis.
           </p>
