@@ -59,14 +59,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    // Simulate Google OAuth
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/checker");
-    setIsLoading(false);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
       {/* Header */}

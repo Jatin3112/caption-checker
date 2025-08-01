@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -79,14 +80,6 @@ export default function SignupPage() {
     }
   };
 
-  const handleGoogleSignup = async () => {
-    setIsLoading(true);
-    // Simulate Google OAuth
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/checker");
-    setIsLoading(false);
-  };
-
   const getPasswordStrengthColor = () => {
     if (passwordStrength <= 2) return "bg-pink-500 dark:bg-pink-400";
     if (passwordStrength <= 3) return "bg-amber-500 dark:bg-amber-400";
@@ -135,17 +128,17 @@ export default function SignupPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Google Signup */}
-              {/* <Button
+              <Button
                 variant="outline"
                 className="w-full border-gray-300 dark:border-slate-600 text-slate-900 dark:text-gray-100 bg-transparent hover:bg-gray-50 dark:hover:bg-slate-700"
-                onClick={handleGoogleSignup}
+                onClick={() => signIn("google", { callbackUrl: "/checker" })}
                 disabled={isLoading}
               >
                 <Chrome className="mr-2 h-4 w-4" />
                 Continue with Google
-              </Button> */}
+              </Button>
 
-              {/* <div className="relative">
+              <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <Separator className="w-full border-gray-200 dark:border-slate-700" />
                 </div>
@@ -154,7 +147,7 @@ export default function SignupPage() {
                     Or create with email
                   </span>
                 </div>
-              </div> */}
+              </div>
 
               {/* Signup Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
