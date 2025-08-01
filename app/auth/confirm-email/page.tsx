@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession } from "next-auth/react";
 
 function EmailConfirmationContent() {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +22,7 @@ function EmailConfirmationContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-  const { user, fetchUser } = useAuth();
+  const { data: session } = useSession();
 
   useEffect(() => {
     // Confirm email on component mount
@@ -38,7 +38,6 @@ function EmailConfirmationContent() {
         const res = await axios.post("/api/confirm-email", { token });
         if (res.status === 200) {
           setIsConfirmed(true);
-          fetchUser();
         } else {
           setError("This email confirmation link is invalid or has expired");
         }
@@ -66,15 +65,18 @@ function EmailConfirmationContent() {
   }, [resendCooldown]);
 
   const handleResendEmail = async () => {
+    if (!session) {
+      toast.error("You need to login to resend email verification link!");
+      return;
+    }
     setIsResending(true);
     setError("");
     try {
       const res = await axios.post("/api/resend-confirm-email", {
-        userId: user._id,
+        userId: session.user._id,
       });
 
       if (res.status === 200 && res.data.alreadyVerified) {
-        fetchUser();
         toast.success("User Already Verified");
         setIsConfirmed(true);
         return;
@@ -86,7 +88,6 @@ function EmailConfirmationContent() {
         setError("Failed to resend email. Please try again.");
       }
     } catch (err: any) {
-      console.error("Resend error:", err);
       setError(
         err?.response?.data?.error ||
           "Failed to resend email. Please try again."
@@ -94,9 +95,6 @@ function EmailConfirmationContent() {
     } finally {
       setIsResending(false);
       setIsLoading(false);
-      setTimeout(() => {
-        router.push("/auth/login");
-      }, 2000);
     }
   };
 
