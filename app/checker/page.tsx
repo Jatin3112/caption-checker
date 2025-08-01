@@ -10,6 +10,7 @@ import { Sparkles, Copy, Check } from "lucide-react";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 interface CaptionAnalysis {
   original_analysis: {
@@ -42,8 +43,8 @@ export default function CheckerPage() {
   const [analysis, setAnalysis] = useState<CaptionAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [user, setUser] = useState<any>(null);
   const [showAllSuggestions, setShowAllSuggestions] = useState(false);
+  const { data: session } = useSession();
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -56,14 +57,6 @@ export default function CheckerPage() {
 
   const analyzeCaption = async (caption: string) => {
     try {
-      const userRes = await axios.get("/api/user");
-      const currentUser = userRes.data.data;
-      setUser(currentUser);
-
-      if (!currentUser?.verified && currentUser.requests >= 1) {
-        toast.error("Please verify your email id for further caption requests");
-        return;
-      }
       const response = await axios.post(
         "/api/analyze",
         { caption, captionVibe },
@@ -93,8 +86,6 @@ export default function CheckerPage() {
     setIsAnalyzing(true);
     try {
       const result = await analyzeCaption(caption);
-
-      console.log("RESUOLT FROM AI", result);
       setAnalysis(result);
     } catch (error) {
       console.error("Analysis failed:", error);

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,12 +20,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
-  const [isDark, setIsDark] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,32 +33,27 @@ export default function LoginPage() {
   });
   const router = useRouter();
 
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await axios.post("/api/login", {
+      const res = await signIn("credentials", {
+        redirect: false,
         email: formData.email,
         password: formData.password,
       });
 
-      await new Promise((res) => setTimeout(res, 300));
-      window.location.href = "/checker";
-      toast.success("Login Successful");
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.error ||
-          "Something went wrong in creating a user"
-      );
+      if (res?.error) {
+        toast.error(res.error);
+      } else if (res?.ok) {
+        toast.success("Login successful");
+        router.push("/checker");
+      } else {
+        toast.error("Login failed unexpectedly");
+      }
+    } catch (error) {
+      toast.error("Something went wrong during login.");
     } finally {
       setIsLoading(false);
     }
@@ -98,17 +92,17 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Google Login */}
-              {/* <Button
+              <Button
                 variant="outline"
                 className="w-full border-gray-300 dark:border-slate-600 text-slate-900 dark:text-gray-100 bg-transparent hover:bg-gray-50 dark:hover:bg-slate-700"
-                onClick={handleGoogleLogin}
+                onClick={() => signIn("google", { callbackUrl: "/checker" })}
                 disabled={isLoading}
               >
                 <Chrome className="mr-2 h-4 w-4" />
                 Continue with Google
-              </Button> */}
+              </Button>
 
-              {/* <div className="relative">
+              <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <Separator className="w-full border-gray-200 dark:border-slate-700" />
                 </div>
@@ -117,7 +111,7 @@ export default function LoginPage() {
                     Or continue with email
                   </span>
                 </div>
-              </div> */}
+              </div>
 
               {/* Email/Password Form */}
               <form onSubmit={handleSubmit} className="space-y-4">

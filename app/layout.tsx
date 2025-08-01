@@ -3,7 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import { AuthProvider } from "@/contexts/AuthContext"; // ✅ Add this
+import AuthProvider from "@/contexts/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Caption Checker",

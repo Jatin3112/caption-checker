@@ -1,7 +1,7 @@
 import User from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import { verifyToken } from "@/lib/verifyToken";
+import { getToken } from "next-auth/jwt";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -9,18 +9,13 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
   const { caption, captionVibe } = await req.json();
-  const token = req.cookies.get("accessToken")?.value;
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const decoded = verifyToken(token);
-  if (!decoded) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-  }
-
-  const user = await User.findById(decoded.userId);
+  const user = await User.findById(token._id);
 
   const planLimits: Record<string, number> = {
     free: 2,

@@ -33,12 +33,12 @@ export async function POST(req: Request) {
   };
 
   // Sign token
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2d" });
 
   user.verifyEmailToken = token;
   await user.save();
 
-  const verifyLink = `https://caption-checker.in/auth/confirm-email?token=${token}`;
+  const verifyLink = `https://www.caption-checker.in/auth/confirm-email?token=${token}`;
 
   await sendUserVerificationEmail(email, verifyLink);
 

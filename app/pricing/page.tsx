@@ -15,12 +15,11 @@ import {
   Users,
   TrendingUp,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 import { loadRazorpayScript } from "@/lib/razorpay";
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession } from "next-auth/react";
 
 interface PricingPlan {
   id: string;
@@ -97,8 +96,8 @@ const planPrices: Record<string, number> = {
 export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { user } = useAuth();
   const router = useRouter();
+  const { data: session } = useSession();
 
   const handlePlanSelect = async (planId: string) => {
     if (planId === "free") {
@@ -106,7 +105,7 @@ export default function PricingPage() {
       return;
     }
 
-    if (!user) {
+    if (!session) {
       router.push("/auth/login");
       return;
     }
@@ -138,7 +137,7 @@ export default function PricingPage() {
         handler: async function (response: any) {
           // Update plan using Axios
           await axios.post("/api/update-plan", {
-            userId: user._id,
+            userId: session.user._id,
             planId,
             paymentId: response.razorpay_payment_id,
           });
@@ -146,8 +145,8 @@ export default function PricingPage() {
           router.push("/payment/success");
         },
         prefill: {
-          name: user.fullName,
-          email: user.email,
+          name: session.user.fullName,
+          email: session.user.email,
         },
         theme: {
           color: "#3399cc",
