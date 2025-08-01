@@ -47,23 +47,19 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      await axios.post("/api/login", {
+        email: formData.email,
+        password: formData.password,
       });
 
-      if (!res.ok) throw new Error("Login failed");
-
       await new Promise((res) => setTimeout(res, 300));
-      // router.push("/checker?login=true");
       window.location.href = "/checker";
       toast.success("Login Successful");
-    } catch (error) {
-      toast.error("Something went wrong during login");
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.error ||
+          "Something went wrong in creating a user"
+      );
     } finally {
       setIsLoading(false);
     }
