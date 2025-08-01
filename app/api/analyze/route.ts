@@ -16,6 +16,9 @@ export async function POST(req: NextRequest) {
   }
 
   const user = await User.findById(token._id);
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
 
   const planLimits: Record<string, number> = {
     free: 2,
