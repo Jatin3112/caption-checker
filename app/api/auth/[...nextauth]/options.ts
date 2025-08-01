@@ -54,21 +54,23 @@ export const authOptions: NextAuthOptions = {
   ],
 
   events: {
-    async signIn({ user, account, profile, isNewUser }) {
-      if (isNewUser && account?.provider === "google") {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
         await connectDB();
-        const existing = await User.findOne({ email: user.email });
-        if (!existing) {
+
+        const existingUser = await User.findOne({ email: user.email });
+        if (!existingUser) {
           await User.create({
             fullName: user.name,
             email: user.email,
-            password: null,
+            password: null, // Google users won't have a password
             verified: true,
             plan: "free",
             requests: 0,
             maxRequests: 3,
             paymentId: null,
           });
+          console.log("✅ New Google user created");
         }
       }
     },
