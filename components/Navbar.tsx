@@ -82,7 +82,7 @@ const Navbar = () => {
                   {(session?.user.fullName ||
                     session?.user.email)[0]?.toUpperCase()}
                 </div>
-                <div className="absolute right-10 top-12 z-10 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-slate-900 dark:text-gray-100 rounded-md shadow-md px-4 py-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                {/* <div className="absolute right-10 top-12 z-10 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-slate-900 dark:text-gray-100 rounded-md shadow-md px-4 py-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                   <div>
                     <strong>Name:</strong> {session?.user.fullName || "N/A"}
                   </div>
@@ -93,7 +93,7 @@ const Navbar = () => {
                     <strong>User Verified:</strong>{" "}
                     {session?.user.verified ? "Verified" : "Not Verified"}
                   </div>
-                </div>
+                </div> */}
                 <Button
                   variant="link"
                   className="text-slate-900 dark:text-gray-100"
@@ -171,9 +171,9 @@ const Navbar = () => {
                     {(session?.user.fullName ||
                       session?.user.email)[0]?.toUpperCase()}
                   </div>
-                  <span className="text-slate-900 dark:text-gray-100 font-medium">
+                  {/* <span className="text-slate-900 dark:text-gray-100 font-medium">
                     {session?.user.fullName || session?.user.email}
-                  </span>
+                  </span> */}
                 </div>
                 <Button
                   variant="ghost"
