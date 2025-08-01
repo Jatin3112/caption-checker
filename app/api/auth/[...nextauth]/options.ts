@@ -85,13 +85,15 @@ export const authOptions: NextAuthOptions = {
         session.user.requests = token.requests;
         session.user.plan = token.plan;
         session.user.image = token.picture;
+        session.user.email = token.email;
       }
       return session;
     },
 
     async jwt({ token, user, account, profile }) {
       if (user) {
-        token._id = user.id || user._id;
+        token._id = user._id?.toString() || user.id;
+        token.email = user.email;
         token.fullName = user.fullName;
         token.verified = user.verified;
         token.requests = user.requests;
