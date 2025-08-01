@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     pro: 4,
   };
 
-  const plan = user.plan || "free";
+  const plan = user?.plan || "free";
   const limit = planLimits[plan] || 2;
 
   if (user.requests >= user.maxRequests) {
