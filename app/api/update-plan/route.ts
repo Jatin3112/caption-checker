@@ -15,8 +15,15 @@ export async function POST(req: NextRequest) {
 
   const planLimits: Record<string, number> = {
     starter: 10,
+    vision: 20,
     popular: 60,
     pro: 150,
+  };
+  const imagePlanLimits: Record<string, number> = {
+    starter: 3,
+    vision: 10,
+    popular: 30,
+    pro: 60,
   };
 
   try {
@@ -29,9 +36,11 @@ export async function POST(req: NextRequest) {
     }
 
     user.requests = 0;
+    user.imageRequests = 0;
     user.plan = planId;
     user.paymentId = paymentId;
     user.maxRequests = planLimits[planId] || 3;
+    user.maxImageRequests = imagePlanLimits[planId] || 1;
 
     await user.save();
 

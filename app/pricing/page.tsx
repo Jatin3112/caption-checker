@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import toast from "react-hot-toast";
 import {
   Check,
   Star,
@@ -43,6 +44,25 @@ const plans: PricingPlan[] = [
     icon: <Sparkles className="h-6 w-6" />,
     features: [
       "10 caption analyses per month",
+      "3 image caption generations per month",
+      "Advanced AI scoring (all metrics)",
+      "2 improved captions per analysis",
+      "Basic hashtag suggestions",
+      // "Caption history (30 days)",
+    ],
+    cta: "Get Started - ₹99",
+  },
+  {
+    id: "vision",
+    name: "Vision",
+    description: "Perfect for trying out CaptionChecker",
+    monthlyPrice: 149,
+    badge: "Innovated",
+    badgeColor: "bg-green-500 dark:bg-green-400",
+    icon: <Sparkles className="h-6 w-6" />,
+    features: [
+      "20 caption analyses per month",
+      "10 image caption generations per month",
       "Advanced AI scoring (all metrics)",
       "2 improved captions per analysis",
       "Basic hashtag suggestions",
@@ -61,9 +81,10 @@ const plans: PricingPlan[] = [
     popular: true,
     features: [
       "60 caption analyses per month",
+      "30 image caption generations per month",
       "Advanced AI scoring (all metrics)",
       "3 improved captions per analysis",
-      "Trending hashtag database",
+      "Trending hashtags",
       // "Caption history (60 days)",
     ],
     cta: "Choose Popular - ₹499",
@@ -78,9 +99,10 @@ const plans: PricingPlan[] = [
     badgeColor: "bg-amber-500 dark:bg-amber-400",
     features: [
       "150 caption analyses per month",
+      "60 image caption generations per month",
       "Advanced AI scoring (all metrics)",
-      "5 improved captions per analysis",
-      "Trending hashtag database",
+      "4 improved captions per analysis",
+      "Trending hashtags",
       // "Caption history (90 days)",
     ],
     cta: "Go Pro - ₹999",
@@ -89,6 +111,7 @@ const plans: PricingPlan[] = [
 
 const planPrices: Record<string, number> = {
   starter: 99,
+  vision: 149,
   popular: 499,
   pro: 999,
 };
@@ -110,14 +133,14 @@ export default function PricingPage() {
       return;
     }
     const amount = planPrices[planId];
-    if (!amount) return alert("Invalid plan selected");
+    if (!amount) return toast.error("Invalid plan selected");
 
     setSelectedPlan(planId);
     setIsProcessing(true);
 
     const razorpayLoaded = await loadRazorpayScript();
     if (!razorpayLoaded) {
-      alert("Razorpay SDK failed to load.");
+      toast.error("Razorpay SDK failed to load.");
       setIsProcessing(false);
       return;
     }
@@ -186,7 +209,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
           {plans.map((plan) => (
             <Card
               key={plan.id}
@@ -291,6 +314,9 @@ export default function PricingPage() {
                     Starter
                   </th>
                   <th className="text-center py-4 text-slate-900 dark:text-gray-100">
+                    Vision
+                  </th>
+                  <th className="text-center py-4 text-slate-900 dark:text-gray-100">
                     Popular
                   </th>
                   <th className="text-center py-4 text-slate-900 dark:text-gray-100">
@@ -304,13 +330,24 @@ export default function PricingPage() {
                     Caption Analyses
                   </td>
                   <td className="text-center py-4">10/month</td>
+                  <td className="text-center py-4">10/month</td>
                   <td className="text-center py-4">60/month</td>
                   <td className="text-center py-4">150/month</td>
                 </tr>
                 <tr className="border-b border-gray-100 dark:border-slate-800">
                   <td className="py-4 text-gray-600 dark:text-gray-300">
+                    Image Caption Generations
+                  </td>
+                  <td className="text-center py-4">3/month</td>
+                  <td className="text-center py-4">10/month</td>
+                  <td className="text-center py-4">20/month</td>
+                  <td className="text-center py-4">50/month</td>
+                </tr>
+                <tr className="border-b border-gray-100 dark:border-slate-800">
+                  <td className="py-4 text-gray-600 dark:text-gray-300">
                     Improved Captions
                   </td>
+                  <td className="text-center py-4">2</td>
                   <td className="text-center py-4">2</td>
                   <td className="text-center py-4">3</td>
                   <td className="text-center py-4">5</td>
@@ -348,8 +385,8 @@ export default function PricingPage() {
                 Is there a free trial?
               </h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm">
-                Try it out! Your first 3 caption requests are on us — no payment
-                needed.
+                Try it out! Your first 3 caption requests and one image caption
+                generation are on us — no payment needed.
               </p>
             </div>
             <div className="text-left">
