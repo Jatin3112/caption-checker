@@ -2,12 +2,15 @@ import User from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
 import { getToken } from "next-auth/jwt";
+import { connectDB } from "@/lib/db";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
 
 export async function POST(req: NextRequest) {
+  await connectDB();
+
   const { caption, captionVibe } = await req.json();
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
