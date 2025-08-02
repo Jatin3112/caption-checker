@@ -8,12 +8,15 @@ const UserSchema = new mongoose.Schema(
     requests: { type: Number, default: 0 },
     maxRequests: { type: Number, default: 3 },
 
+    imageRequests: { type: Number, default: 0 },
+    maxImageRequests: { type: Number, default: 1 },
+
     verifyEmailToken: { type: String, default: null },
     verified: { type: Boolean, default: false },
 
     plan: {
       type: String,
-      enum: ["free", "starter", "popular", "pro"],
+      enum: ["free", "starter", "vision", "popular", "pro"],
       default: "free",
     },
     paymentId: {
