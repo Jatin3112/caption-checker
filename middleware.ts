@@ -36,6 +36,7 @@ export async function middleware(request: NextRequest) {
 
   // 4️⃣ Protect /checker
   if (!token && pathname.startsWith("/checker")) {
+    console.log("🚫 No token found, redirecting to /auth/login");
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(loginUrl);
