@@ -5,34 +5,35 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1️⃣ Skip middleware for NextAuth API routes & login page
+  // Skip NextAuth routes, login page, static files, and assets
   if (
-    pathname.startsWith("/api/auth") || // NextAuth endpoints
-    pathname.startsWith("/auth/login") // Login page
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/auth/login") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/static") ||
+    pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // 2️⃣ Check session token
+  // Get the NextAuth session token
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
-    secureCookie: process.env.NODE_ENV === "production",
+    secureCookie: true,
   });
 
-  // 3️⃣ Redirect to login if no token on protected route
+  // If not logged in and accessing /checker → send to login
   if (!token && pathname.startsWith("/checker")) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/auth/login";
-    loginUrl.search = ""; // Remove query params to avoid loops
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // 4️⃣ Allow request through
   return NextResponse.next();
 }
 
-// 5️⃣ Only run on /checker pages
+// Only run for /checker routes
 export const config = {
   matcher: ["/checker/:path*"],
 };
