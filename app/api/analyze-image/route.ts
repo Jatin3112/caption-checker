@@ -92,7 +92,7 @@ Generate ${limit} **improved, scroll-stopping, platform-optimized captions** tha
 ONLY return this JSON array. Do NOT include explanation, caption analysis, or commentary. Focus purely on creating viral-style captions derived directly from the image content.`;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-5-mini",
     messages: [
       {
         role: "user",
@@ -105,7 +105,6 @@ ONLY return this JSON array. Do NOT include explanation, caption analysis, or co
         ],
       },
     ],
-    temperature: 0.7,
   });
 
   const aiRaw = completion.choices[0].message.content || "";

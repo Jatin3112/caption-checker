@@ -134,9 +134,8 @@ Give scores from **1 to 10**, or **Yes/No** for CTA. Keep each score **strict an
 `;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-5",
     messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
   });
 
   const aiRaw = completion.choices[0].message.content || "";
