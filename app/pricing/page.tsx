@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
 import {
   Check,
+  Sparkle,
   Star,
   Zap,
   Crown,
@@ -41,7 +42,7 @@ const plans: PricingPlan[] = [
     name: "Starter",
     description: "Perfect for trying out CaptionChecker",
     monthlyPrice: 99,
-    icon: <Sparkles className="h-6 w-6" />,
+    icon: <Sparkle className="h-6 w-6" />,
     features: [
       "10 caption analyses per month",
       "3 image caption generations per month",
@@ -120,7 +121,7 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
 
   const handlePlanSelect = async (planId: string) => {
     if (planId === "free") {
@@ -164,6 +165,7 @@ export default function PricingPage() {
             planId,
             paymentId: response.razorpay_payment_id,
           });
+          await update();
 
           router.push("/payment/success");
         },

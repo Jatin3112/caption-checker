@@ -78,19 +78,36 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async session({ session, token }) {
-      if (token && session.user) {
+      if (!session.user) return session;
+
+      const dbUser = await User.findById(token._id).lean();
+
+      if (dbUser) {
+        // explicitly cast to your User type
+        const user = dbUser as any;
+
+        session.user._id = user._id.toString();
+        session.user.fullName = user.fullName;
+        session.user.email = user.email;
+        session.user.verified = user.verified;
+        session.user.requests = user.requests;
+        session.user.plan = user.plan;
+        session.user.image = user.image;
+      } else {
+        // fallback from token
         session.user._id = token._id;
         session.user.fullName = token.fullName;
+        session.user.email = token.email!;
         session.user.verified = token.verified;
         session.user.requests = token.requests;
         session.user.plan = token.plan;
-        session.user.image = token.picture;
-        session.user.email = token.email;
+        session.user.image = token.image;
       }
+
       return session;
     },
 
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token._id = user._id?.toString() || user.id;
         token.email = user.email;

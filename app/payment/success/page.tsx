@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Moon, Sun, CheckCircle, Sparkles, ArrowRight } from "lucide-react";
+import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
@@ -20,9 +19,6 @@ export default function PaymentSuccessPage() {
               <div className="flex justify-center mb-4">
                 <div className="relative">
                   <CheckCircle className="h-20 w-20 text-green-500 dark:text-green-400" />
-                  <div className="absolute -top-2 -right-2">
-                    <Sparkles className="h-8 w-8 text-amber-500 dark:text-amber-400" />
-                  </div>
                 </div>
               </div>
               <CardTitle className="text-2xl text-slate-900 dark:text-gray-100">
@@ -42,19 +38,15 @@ export default function PaymentSuccessPage() {
                 <ul className="text-sm text-green-700 dark:text-green-300 space-y-1 text-left">
                   <li className="flex items-center">
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Start analyzing captions with unlimited access
+                    Start analyzing captions with AI
                   </li>
                   <li className="flex items-center">
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Get 3 AI-improved versions per caption
+                    Get AI-improved versions per caption
                   </li>
                   <li className="flex items-center">
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Access your caption history & analytics
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Priority customer support
+                    Create great captions just by uploading images
                   </li>
                 </ul>
               </div>

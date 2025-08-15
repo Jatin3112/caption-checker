@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import Link from "next/link";
+import UserAvatar from "./UserAvatar";
 
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
@@ -78,10 +79,7 @@ const Navbar = () => {
               </>
             ) : (
               <div className="relative group flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-indigo-500 dark:bg-violet-500 flex items-center justify-center text-white font-semibold text-sm cursor-pointer">
-                  {(session?.user.fullName ||
-                    session?.user.email)[0]?.toUpperCase()}
-                </div>
+                <UserAvatar session={session} />
                 {/* <div className="absolute right-10 top-12 z-10 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-slate-900 dark:text-gray-100 rounded-md shadow-md px-4 py-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                   <div>
                     <strong>Name:</strong> {session?.user.fullName || "N/A"}
@@ -167,10 +165,7 @@ const Navbar = () => {
             ) : (
               <div className="space-y-1">
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-indigo-500 dark:bg-violet-500 flex items-center justify-center text-white font-semibold text-sm">
-                    {(session?.user.fullName ||
-                      session?.user.email)[0]?.toUpperCase()}
-                  </div>
+                  <UserAvatar session={session} />
                   {/* <span className="text-slate-900 dark:text-gray-100 font-medium">
                     {session?.user.fullName || session?.user.email}
                   </span> */}
