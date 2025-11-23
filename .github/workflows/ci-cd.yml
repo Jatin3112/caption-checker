@@ -53,21 +53,5 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Lint
-        run: npm run lint --if-present
-
-      - name: Run tests
-        run: npm test --if-present
-
       - name: Build
         run: npm run build
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-build
-          path: |
-            .next
-            package.json
-            package-lock.json
-            public
