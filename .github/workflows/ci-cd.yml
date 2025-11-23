@@ -1,0 +1,73 @@
+name: Next.js CI / CD
+
+# Run on: any push (all branches) and PRs targeting 'main'
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: nextjs-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  NODE_VERSION: "18" # change if you use another Node LTS
+  DEPLOY_DIR: /var/www/myapp # change to your server path
+
+jobs:
+  ci:
+    name: CI — lint, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm" # uses setup-node's npm cache support
+
+      - name: Restore npm/yarn cache
+        uses: actions/cache@v4
+        with:
+          # Adjust if using yarn (use yarn.lock) or pnpm (pnpm-lock.yaml)
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-build-${{ github.sha }}
+          restore-keys: |
+            nextjs-build-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Run tests
+        run: npm test --if-present
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: |
+            .next
+            package.json
+            package-lock.json
+            public
