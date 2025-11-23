@@ -1,57 +1,29 @@
-name: Next.js CI / CD
+name: Next.js CI
 
-# Run on: any push (all branches) and PRs targeting 'main'
 on:
   push:
-    branches: ["**"]
+    branches: ["**"] # run on all branches
   pull_request:
-    branches: ["main"]
-
-concurrency:
-  group: nextjs-ci-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: read
-  id-token: write
-
-env:
-  NODE_VERSION: "18" # change if you use another Node LTS
-  DEPLOY_DIR: /var/www/myapp # change to your server path
+    branches: ["main"] # run PR checks on main
 
 jobs:
-  ci:
-    name: CI — lint, test, build
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm" # uses setup-node's npm cache support
-
-      - name: Restore npm/yarn cache
-        uses: actions/cache@v4
-        with:
-          # Adjust if using yarn (use yarn.lock) or pnpm (pnpm-lock.yaml)
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Restore Next.js cache
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: nextjs-build-${{ github.sha }}
-          restore-keys: |
-            nextjs-build-
+          node-version: 18
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
-      - name: Build
+      - name: Build Next.js
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: npm run build
